@@ -1,0 +1,102 @@
+#!/usr/bin/env bash
+
+NOTES_FILE="$HOME/.qq_notes"
+VAULT_DIR="$HOME/.qq_vault"
+
+mkdir -p "$VAULT_DIR"
+touch "$NOTES_FILE"
+
+# ANSI colors
+YELLOW="\033[1;33m"
+WHITE="\033[0;37m"
+RESET="\033[0m"
+
+case "$1" in
+  p) # Print notes
+     if [[ -z "$2" ]]; then
+         awk -v yellow="$YELLOW" -v white="$WHITE" -v reset="$RESET" '
+           /^\[[0-9]+\]/ {
+             match($0, /^\[[0-9]+\]/)
+             id = substr($0, RSTART, RLENGTH)
+             note = substr($0, RSTART + RLENGTH + 1)
+             gsub(/^ +/, "", note)
+             printf "%s%s%s %s%s%s\n", yellow, id, reset, white, note, reset
+             next
+           }
+           { print }
+         ' "$NOTES_FILE"
+     else
+         awk -v yellow="$YELLOW" -v white="$WHITE" -v reset="$RESET" -v id="$2" '
+           $1 == "[" id "]" {
+             $1=""
+             sub(/^ /, "")
+             printf "%s[%s]%s %s%s%s\n", yellow, id, reset, white, $0, reset
+           }
+         ' "$NOTES_FILE"
+     fi
+     ;;
+  r) # Remove a note
+     if [[ -z "$2" ]]; then
+         echo "Usage: qq r <id>"
+         exit 1
+     fi
+     tmp=$(mktemp)
+     awk -v id="$2" '
+       BEGIN { skip=0 }
+       $1 == "[" id "]" { skip=1; next }
+       skip==1 && NF==0 { skip=0; next }
+       { print }
+     ' "$NOTES_FILE" > "$tmp" && mv "$tmp" "$NOTES_FILE"
+     ;;
+  v) # Vault a note
+     if [[ -z "$2" || -z "$3" ]]; then
+         echo "Usage: qq v <id> <title words...>"
+         exit 1
+     fi
+     id="$2"
+     shift 2
+     title="$*"
+     safe_title=$(echo "$title" | tr '[:upper:]' '[:lower:]' | tr ' ' '-' | tr -cd 'a-z0-9-_')
+
+     note_text=$(awk -v id="$id" '
+       $1 == "[" id "]" { $1=""; sub(/^ /, ""); print; next }
+     ' "$NOTES_FILE")
+
+     if [[ -z "$note_text" ]]; then
+         echo "Note ID $id not found."
+         exit 1
+     fi
+
+     echo "$note_text" > "$VAULT_DIR/$safe_title.txt"
+
+     tmp=$(mktemp)
+     awk -v id="$id" '
+       BEGIN { skip=0 }
+       $1 == "[" id "]" { skip=1; next }
+       skip==1 && NF==0 { skip=0; next }
+       { print }
+     ' "$NOTES_FILE" > "$tmp" && mv "$tmp" "$NOTES_FILE"
+
+     echo "Moved note [$id] to $VAULT_DIR/$safe_title.txt"
+     ;;
+  *)
+     # Add a note
+     if [[ -z "$1" ]]; then
+         echo "Usage:"
+         echo "  qq <note text>         # Add note"
+         echo "  qq p                   # Print all notes"
+         echo "  qq p <id>              # Print specific note"
+         echo "  qq r <id>              # Remove note"
+         echo "  qq v <id> <title...>   # Vault note to file"
+         exit 1
+     fi
+     if [[ ! -s "$NOTES_FILE" ]]; then
+         id=1
+     else
+         id=$(( $(grep -o '^\[[0-9]\+\]' "$NOTES_FILE" | tr -d '[]' | sort -n | tail -1) + 1 ))
+     fi
+     echo "[$id] $*" >> "$NOTES_FILE"
+     echo "" >> "$NOTES_FILE"
+     ;;
+esac
+
