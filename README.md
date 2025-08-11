@@ -1,7 +1,7 @@
 # qq
 
 ## Summary
-A small note taking CLI script. Needed it real quick so it's actually vibe coded with ChatGPT 5. 
+A small note taking CLI script mainly for temporary notes. The notes can be added to a vault if it's valuable to save them for longer. Needed it real quick so it's actually vibe coded with ChatGPT 5. 
 
 ## Installation
 
