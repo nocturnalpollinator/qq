@@ -12,7 +12,7 @@ WHITE="\033[0;37m"
 RESET="\033[0m"
 
 case "$1" in
-  p) # Print notes
+  p|l) # Print notes
      if [[ -z "$2" ]]; then
          awk -v yellow="$YELLOW" -v white="$WHITE" -v reset="$RESET" '
            /^\[[0-9]+\]/ {
@@ -84,8 +84,8 @@ case "$1" in
      if [[ -z "$1" ]]; then
          echo "Usage:"
          echo "  qq <note text>         # Add note"
-         echo "  qq p                   # Print all notes"
-         echo "  qq p <id>              # Print specific note"
+         echo "  qq p|l                 # Print/list all notes"
+         echo "  qq p|l <id>            # Print/list specific note"
          echo "  qq r <id>              # Remove note"
          echo "  qq v <id> <title...>   # Vault note to file"
          exit 1
