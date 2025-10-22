@@ -14,8 +14,9 @@ Probably something similar to MacOS. You'll figure it out.
 ## Usage
 ```
   qq <note text>         # Add note
-  qq p                   # Print all notes
-  qq p <id>              # Print specific note
+  qq p|l                 # Print all notes
+  qq pt|lt               # Print all notes prefixed with "TODO:"
+  qq p|l <id>            # Print specific note
   qq r <id>              # Remove note
   qq v <id> <title...>   # Vault note to file
 ```
