@@ -35,6 +35,19 @@ case "$1" in
          ' "$NOTES_FILE"
      fi
      ;;
+  pt|lt) # List TODO notes
+     awk -v yellow="$YELLOW" -v white="$WHITE" -v reset="$RESET" '
+       /^\[[0-9]+\]/ {
+         match($0, /^\[[0-9]+\]/)
+         id = substr($0, RSTART, RLENGTH)
+         note = substr($0, RSTART + RLENGTH + 1)
+         gsub(/^ +/, "", note)
+         if (note ~ /^TODO:/) {
+           printf "%s%s%s %s%s%s\n", yellow, id, reset, white, note, reset
+         }
+       }
+     ' "$NOTES_FILE"
+     ;;
   r) # Remove a note
      if [[ -z "$2" ]]; then
          echo "Usage: qq r <id>"
@@ -85,7 +98,8 @@ case "$1" in
          echo "Usage:"
          echo "  qq <note text>         # Add note"
          echo "  qq p|l                 # Print/list all notes"
-         echo "  qq p|l <id>            # Print/list specific note"
+         echo "  qq p|l <id>            # Print specific note"
+         echo "  qq lt                  # List all TODO notes"
          echo "  qq r <id>              # Remove note"
          echo "  qq v <id> <title...>   # Vault note to file"
          exit 1
