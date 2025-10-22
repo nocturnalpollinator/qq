@@ -99,7 +99,7 @@ case "$1" in
          echo "  qq <note text>         # Add note"
          echo "  qq p|l                 # Print/list all notes"
          echo "  qq p|l <id>            # Print specific note"
-         echo "  qq lt                  # List all TODO notes"
+         echo "  qq pt|lt               # List all TODO notes"
          echo "  qq r <id>              # Remove note"
          echo "  qq v <id> <title...>   # Vault note to file"
          exit 1
