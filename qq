@@ -92,11 +92,22 @@ case "$1" in
 
      echo "Moved note [$id] to $VAULT_DIR/$safe_title.txt"
      ;;
+  t)
+     if [[ ! -s "$NOTES_FILE" ]]; then
+         id=1
+     else
+         id=$(( $(grep -o '^\[[0-9]\+\]' "$NOTES_FILE" | tr -d '[]' | sort -n | tail -1) + 1 ))
+     fi	
+     shift
+     echo "[$id] TODO: $*" >> "$NOTES_FILE"
+     echo "" >> "$NOTES_FILE"
+     ;;
   *)
      # Add a note
      if [[ -z "$1" ]]; then
          echo "Usage:"
          echo "  qq <note text>         # Add note"
+         echo "  qq t <note text>       # Add note with TODO: prefix"
          echo "  qq p|l                 # Print/list all notes"
          echo "  qq p|l <id>            # Print specific note"
          echo "  qq pt|lt               # List all TODO notes"

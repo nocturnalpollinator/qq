@@ -14,6 +14,7 @@ Probably something similar to MacOS. You'll figure it out.
 ## Usage
 ```
   qq <note text>         # Add note
+  qq t <note text>       # Add note with TODO: prefix
   qq p|l                 # Print all notes
   qq pt|lt               # Print all notes prefixed with "TODO:"
   qq p|l <id>            # Print specific note
